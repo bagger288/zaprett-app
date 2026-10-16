@@ -37,11 +37,14 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    - name: Set up Android SDK
-      uses: android-actions/setup-android@v3
-
-    - name: Setup NDK
-      run: sdkmanager "ndk;27.0.12077973" "cmake;3.22.1"
+    - name: Setup Android SDK, NDK and CMake
+      run: |
+        SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+        if [ ! -x "$SDKMANAGER" ]; then
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/$(ls $ANDROID_HOME/cmdline-tools | sort -V | tail -1)/bin/sdkmanager"
+        fi
+        yes | "$SDKMANAGER" --licenses > /dev/null || true
+        "$SDKMANAGER" "ndk;27.0.12077973" "cmake;3.22.1"
 
     - name: Install toolchain
       run: |
